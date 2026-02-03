@@ -18,27 +18,55 @@
 #   this function terminates the program with error code 76.
 # =======================================================
 dot:
-
+    li t0, 1
+    blt a2, t0, invalid_length
+    blt a3, t0, invalid_stride
+    blt a4, t0, invalid_stride
     # Prologue
-
-
-loop_start:
-
-
-
-
-
-
-
-
-
-
-
-
-loop_end:
-
-
-    # Epilogue
-
+    addi sp, sp, -20
+    sw s0, 0(sp)
+    sw s1, 4(sp)
+    sw s2, 8(sp)
+    sw s3, 12(sp)
+    sw s4, 16(sp)
     
+    mv s0, a0
+    mv s1, a1
+    mv s2, a2
+    mv s3, a3
+    mv s4, a4
+    
+    mv t0, s3
+    mv t1, s4
+
+    slli t0, t0, 2
+    slli t1, t1, 2
+    
+    li t2, 0
+    li t3, 0
+loop_start:
+    beq t2, s2, loop_end
+    lw t4, 0(s0)
+    lw t5, 0(s1)
+    mul t6, t4, t5
+    add t3, t3, t6
+    addi t2, t2, 1
+    add s0, s0, t0
+    add s1, s1, t1
+    j loop_start
+loop_end:
+    mv a0, t3
+    # Epilogue
+    lw s0, 0(sp)
+    lw s1, 4(sp)
+    lw s2, 8(sp)
+    lw s3, 12(sp)
+    lw s4, 16(sp)
+    addi sp, sp, 20
     ret
+invalid_length:
+    li a0, 75
+    jal exit2
+invalid_stride:
+    li a0, 76
+    jal exit2
